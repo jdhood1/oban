@@ -181,6 +181,8 @@ defmodule Oban.Peers.Postgres do
       |> where([p], p.name == ^inspect(conf.name))
       |> where([p], p.expires_at < ^DateTime.utc_now())
 
+    Logger.info("#{inspect(__MODULE__)}.delete_expired_peers Repo.delete_all(...)", conf: inspect(conf), query: inspect(query))
+
     Repo.delete_all(conf, query)
 
     state
@@ -188,6 +190,8 @@ defmodule Oban.Peers.Postgres do
 
   defp delete_self(%State{conf: conf}) do
     query = where("oban_peers", name: ^inspect(conf.name), node: ^conf.node)
+
+    Logger.info("#{inspect(__MODULE__)}.delete_self Repo.delete_all(...)", conf: inspect(conf), query: inspect(query))
 
     Repo.delete_all(conf, query)
   end

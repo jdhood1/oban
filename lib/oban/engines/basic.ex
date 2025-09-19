@@ -17,6 +17,8 @@ defmodule Oban.Engines.Basic do
   alias Ecto.Changeset
   alias Oban.{Config, Engine, Job, Repo}
 
+  require Logger
+
   # This is a replacement for `push`, which uses `array_append` and isn't compatible with jsonb
   # arrays. The `||` operator works with both arrays and jsonb.
   defmacrop concat_errors(column, error) do
@@ -170,6 +172,8 @@ defmodule Oban.Engines.Basic do
       Job
       |> join(:inner, [j], x in subquery(subquery), on: j.id == x.id)
       |> select([_, x], map(x, [:id, :queue, :state]))
+
+    Logger.info("#{inspect(__MODULE__)}.prune_jobs Repo.delete_all(...)", conf: inspect(conf), query: inspect(query))
 
     {_count, pruned} = Repo.delete_all(conf, query)
 
